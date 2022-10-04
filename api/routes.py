@@ -1,16 +1,7 @@
 from definitions import validate_json
-from routes_definitions import CreateUser, User
+from routes_definitions import CreateUser, User, scan, dynamodb
 import os, logging, json
-# In order to get type annotations for boto3, one has to install this: https://pypi.org/project/boto3-stubs/
-import boto3
 from flask import request, Blueprint
-
-# If we run the code locally we have to set a profile explicitly using the env_var AWS_PROFILE
-if "AWS_LAMBDA_FUNCTION_NAME" not in os.environ:
-    session = boto3.Session(profile_name=os.environ.get("AWS_PROFILE", "demo-user"))
-    dynamodb = session.resource("dynamodb")
-else:
-    dynamodb = boto3.resource("dynamodb")
 
 table_name = os.environ.get("TABLE_USER_NAME", "teststack-user-v1")
 
@@ -18,11 +9,14 @@ routes = Blueprint("routes", __name__)
 
 @routes.get("/users")
 def get_all_user():
-    limit = 50
-    resp = dynamodb.Table(table_name).scan(Limit=limit)
-    items = resp["Items"]
+    kwargs = {}
+    if "nextToken" in request.args:
+      kwargs["next_token"] = request.args["nextToken"]
+    kwargs["limit"] = request.args.get("limit", 5, type=int)
+
+    items, next_token = scan(table_name, **kwargs)
     users = [User(id=item["userId"], email=item["email"], name=item["name"]) for item in items]
-    return [User.Schema().dumps(u) for u in users]
+    return { "user": [User.Schema().dumps(u) for u in users], "nextToken": next_token }
 
 @routes.get("/users/<id>")
 def get_user(id: str):
