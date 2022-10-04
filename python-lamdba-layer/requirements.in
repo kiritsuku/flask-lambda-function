@@ -1,0 +1,4 @@
+# Used by pip-tools: https://github.com/jazzband/pip-tools
+
+Flask
+marshmallow-dataclass

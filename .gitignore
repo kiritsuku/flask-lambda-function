@@ -1,0 +1,43 @@
+# IntelliJ #
+.idea/
+logs
+target
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+
+# VSCode
+.vscode/
+
+# OS generated files #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db/RUNNING_PID
+
+# Local configuration
+application_local.conf
+
+.bsp
+
+# Terraform
+*.tfvars
+.terraform/
+*.tfstate
+*.tfstate.*
+builds/
+
+#Maven
+dependency-reduced-pom.xml
+
+.aws/
+
+# Python
+.env/
+package/
+__pycache__/

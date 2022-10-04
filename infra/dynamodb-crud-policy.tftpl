@@ -1,0 +1,30 @@
+${
+# See: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html#dynamo-db-crud-policy
+jsonencode({
+  Version = "2012-10-17"
+  Statement = [
+    {
+      Sid = "DynamoDBCrudPolicy"
+      Effect = "Allow"
+      Resource = flatten([
+        for table_arn in table_arns : [
+          "${table_arn}",
+          "${table_arn}/index/*"
+        ]
+      ])
+      Action = [
+        "dynamodb:GetItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:PutItem",
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:UpdateItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:BatchGetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:ConditionCheckItem",
+      ]
+    }
+  ]
+})
+}
