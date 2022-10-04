@@ -6,8 +6,10 @@ This project consists of three parts:
 
     The layer needs to be built first with `/python-lamdba-layer/build.sh` before it can be deployed.
 3. An actual lambda function, in `/api`. It provides a simple AWS HTTP Gateway with three endpoints:
-   1. `GET /users`: Retrieve a user
-   2. `GET /users/{id}`: Retrieve all users
+   1. `GET /users`: Retrieve a list of users. Query parameters:
+      1. `limit` to configure the number of returned values
+      2. `nextToken` to specify the start item
+   2. `GET /users/{id}`: Retrieve a user
    3. `POST /users`: Create a user. Payload: `{ "name": "string", "email": "string" }`
 
    The user data is stored in and retrieved from a DynamoDB table.
