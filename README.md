@@ -1,5 +1,72 @@
 # Template for Flask based AWS lambda function
 
+## Motivation
+
+Setting up lambda functions on AWS can be cumbersome since they use their own event based invocation mechanism. The entry point for a Python AWS lambda function could look like this and is called a [lambda function handler](https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html):
+```python
+def lambda_handler(event, context):
+    message = f"Hello {event['first_name']} {event['last_name]'}!"
+    return {
+        'message' : message
+    }
+```
+In case the lambda function is invoked through a HTTP API that is provided through [AWS API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html) the process of handling the requests is unconventional:
+```python
+import os
+import json
+
+def lambda_handler(event, context):
+    http = event["requestContext"]["http"]
+    path = http["path"]
+    method = http["method"]
+
+    if path == "/my/path" and method == "GET":
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({
+                "message": "/my/path exists"
+            })
+        }
+    else:
+        return {
+            "statusCode": 404
+            "body": json.dumps({
+                "message": f"Not found: {method} {path}"
+            })
+        }
+```
+Since we have to handle the event from API Gateway we can't reuse code from any library or framework that provides a HTTP routing functionality.
+
+Wouldn't it be great if instead we could just use some code written in say [Flask](https://flask.palletsprojects.com/en/2.2.x/quickstart/) directly with API Gateway? Something that would look like this:
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.get("/my/path")
+def my_path():
+    return { "message": "/my/path exists" }
+```
+
+In this project it is shown that something very similar can actually be achieved. The Python code
+
+```python
+from flask import Blueprint
+
+routes = Blueprint("routes", __name__)
+
+@routes.get("/my/path")
+def my_path():
+    return { "message": "/my/path exists" }
+```
+
+would be able to serve the provided Flask based routes as a lambda function, which only has to include a [lambda layer](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) that is able to translate the lambda function event model to a request Flask can understand and repeat the other way around, the translation from a Flask response to a lambda function event response.
+
+## Project Overview
+
 This project consists of three parts:
 
 1. A lambda layer, in `/python-lamdba-layer`. It provides an execution environment for Flask based lambda functions. This lambda layer contains an entry point for Python based lambda functions, which is `main.handler`, in `/python-lamdba-layer/main.py`. The function converts an AWS lambda function event into a [WSGI](https://medium.com/analytics-vidhya/what-is-wsgi-web-server-gateway-interface-ed2d290449e) compatible request, which then can be handled by Flask.
