@@ -18,8 +18,8 @@ def get_all_user():
     users = [User(id=item["userId"], email=item["email"], name=item["name"]) for item in items]
     return PaginatedList.Schema().dump(PaginatedList(
         items=[User.Schema().dump(u) for u in users],
-        nextToken=next_token,
-        numberOfItems=len(users)
+        next_token=next_token,
+        number_of_items=len(users)
     ))
 
 @routes.get("/users/<id>")

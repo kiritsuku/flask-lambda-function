@@ -18,11 +18,23 @@ class CreateUser:
     name: str
     Schema: ClassVar[Type[Schema]] = Schema
 
-@dataclass
+class CamelCaseSchema(Schema):
+    """A Schema that marshals field names in camel case."""
+
+    def on_bind_field(self, field_name, field_obj):
+        field_obj.data_key = self.to_camel_case(field_name)
+
+    def to_camel_case(self, text: str):
+        if len(text) == 0:
+            return ""
+        splits = text.replace("_", " ").split()
+        return splits[0] + "".join(s.capitalize() for s in splits[1:])
+
+@dataclass(base_schema=CamelCaseSchema)
 class PaginatedList:
     items: List[Dict[str, Any]]
-    nextToken: str
-    numberOfItems: int
+    next_token: str
+    number_of_items: int
     Schema: ClassVar[Type[Schema]] = Schema
 
 # If we run the code locally we have to set a profile explicitly using the env_var AWS_PROFILE
