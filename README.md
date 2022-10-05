@@ -121,3 +121,9 @@ This project consists of three parts:
         return { "value": "Hello World" }
     ```
     Again, the value `routes` at `(3)` needs to be called this way, in the same way how the file name at `(2)` is also required to be named this way.
+
+## Similar projects
+
+- [Zappa](https://github.com/zappa/Zappa) - Provides some functionality to make deploying of Python based lambda functions as easy as possible but lacks the ability to create other infrastructure resources (like databases).
+- [awsgi](https://github.com/slank/awsgi) - A Python library that can be added to the project but contains some bugs and is unmaintained.
+- [serverless-wsgi](https://github.com/logandk/serverless-wsgi) - [Serverless](https://www.serverless.com/) based tool for people who don't want to use Terraform.
