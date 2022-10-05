@@ -1,4 +1,4 @@
-from typing import ClassVar, Type, Dict, List, Tuple
+from typing import ClassVar, Type, Dict, List, Tuple, Any
 from marshmallow import Schema
 from marshmallow_dataclass import dataclass
 import os, base64, json
@@ -16,6 +16,13 @@ class User:
 class CreateUser:
     email: str
     name: str
+    Schema: ClassVar[Type[Schema]] = Schema
+
+@dataclass
+class PaginatedList:
+    items: List[Dict[str, Any]]
+    nextToken: str
+    numberOfItems: int
     Schema: ClassVar[Type[Schema]] = Schema
 
 # If we run the code locally we have to set a profile explicitly using the env_var AWS_PROFILE
@@ -68,4 +75,3 @@ def all_items(table_name: str) -> List[Dict[str, object]]:
         new_items, next_token = scan(table_name, limit, next_token=next_token)
         items.extend(new_items)
     return items
-

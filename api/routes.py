@@ -1,6 +1,6 @@
 from definitions import validate_json
-from routes_definitions import CreateUser, User, scan, dynamodb
-import os, logging, json
+from routes_definitions import CreateUser, PaginatedList, User, scan, dynamodb
+import os
 from flask import request, Blueprint
 
 table_name = os.environ.get("TABLE_USER_NAME", "teststack-user-v1")
@@ -16,7 +16,11 @@ def get_all_user():
 
     items, next_token = scan(table_name, **kwargs)
     users = [User(id=item["userId"], email=item["email"], name=item["name"]) for item in items]
-    return { "user": [User.Schema().dumps(u) for u in users], "nextToken": next_token }
+    return PaginatedList.Schema().dump(PaginatedList(
+        items=[User.Schema().dump(u) for u in users],
+        nextToken=next_token,
+        numberOfItems=len(users)
+    ))
 
 @routes.get("/users/<id>")
 def get_user(id: str):
