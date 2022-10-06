@@ -10,9 +10,8 @@ def lambda_handler(event, context):
         'message' : message
     }
 ```
-In case the lambda function is invoked through a HTTP API that is provided through [AWS API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html) the process of handling the requests is unconventional:
+In case the lambda function is invoked through a HTTP API that is provided through [AWS API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html) the process of handling the requests is quite a mouthful:
 ```python
-import os
 import json
 
 def lambda_handler(event, context):
