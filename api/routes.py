@@ -34,6 +34,15 @@ def get_user(id: str):
 @routes.post("/users")
 def create_user():
     def handle_create_user(user: CreateUser):
+        respEmailExists = dynamodb.Table(table_name).query(
+            IndexName="email-index",
+            KeyConditionExpression="#key = :key",
+            ExpressionAttributeNames={"#key": "email"},
+            ExpressionAttributeValues={":key": user.email},
+        )
+        if len(respEmailExists["Items"]) > 0:
+            return { "message": "Invalid email address" }, 400
+
         u = User(
             id=unique_id(),
             email=user.email,
